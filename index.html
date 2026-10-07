@@ -37,23 +37,25 @@
         .current-coach h2 { font-size: 1.5rem; color: var(--accent-gold); }
         .current-coach p { color: var(--text-muted); font-size: 0.9rem; }
         .status-pill { background: #0f172a; border: 1px solid var(--border); padding: 4px 10px; border-radius: 15px; font-size: 0.8rem; color: var(--accent-blue); }
-        .controls { display: flex; gap: 10px; background: #0f172a; padding: 10px; border-radius: 6px; border: 1px solid var(--border); }
+        .controls { display: flex; gap: 10px; background: #0f172a; padding: 10px; border-radius: 6px; border: 1px solid var(--border); align-items: center; }
         .btn { background: var(--accent-blue); color: #fff; border: none; padding: 8px 14px; border-radius: 5px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
         .btn-stop { background: #ef4444; }
         .qa-list { display: flex; flex-direction: column; gap: 12px; }
         .qa-card { background: #0f172a; border: 1px solid var(--border); border-radius: 6px; padding: 14px; }
         .qa-card.speaking { border-color: var(--accent-gold); }
-        .question { font-weight: 600; color: var(--accent-blue); margin-bottom: 6px; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
-        .answer { color: var(--text-main); font-size: 0.9rem; line-height: 1.4; }
+        .reporter-tag { font-weight: 700; color: #38bdf8; font-size: 0.85rem; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
+        .question { font-weight: 500; color: #cbd5e1; margin-bottom: 8px; font-size: 0.9rem; font-style: italic; }
+        .answer { color: var(--text-main); font-size: 0.9rem; line-height: 1.4; border-left: 3px solid var(--accent-gold); padding-left: 10px; }
         .play-single-btn { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 2px 6px; border-radius: 3px; font-size: 0.7rem; cursor: pointer; }
         .play-single-btn:hover { color: #fff; border-color: #fff; }
+        .coach-voice-tag { font-size: 0.75rem; color: var(--accent-gold); font-style: italic; }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>Fantasy Football Post-Game Press Conference</h1>
-        <p>Week 4 Media Briefing — Hear from all 12 Managers</p>
+        <h1>NFL Beat Writers Post-Game Press Conference</h1>
+        <p>Week 4 Media Room — Hear from the Press and League Managers</p>
     </header>
 
     <div class="layout">
@@ -72,8 +74,9 @@
             </div>
 
             <div class="controls">
-                <button class="btn" id="playAllBtn">Play Full Conference</button>
+                <button class="btn" id="playAllBtn">Play Full Press Conference</button>
                 <button class="btn btn-stop" id="stopBtn">Stop Audio</button>
+                <span id="voicePersona" class="coach-voice-tag"></span>
             </div>
 
             <div class="qa-list" id="qaList"></div>
@@ -83,133 +86,165 @@
     <script>
         const coaches = [
             {
-                rank: 1, name: "Kyle K", team: "(Jonathan) Taylor's Version", record: "4-0", points: "498.36 PF", pitch: 1.15, rate: 1.05,
+                rank: 1, name: "Kyle K", team: "(Jonathan) Taylor's Version", record: "4-0", points: "498.36 PF", 
+                persona: "Voice Style: Dan Campbell (Aggressive, Intense, Fast)", pitch: 0.8, rate: 1.15, gender: "male",
                 qas: [
-                    { q: "Reporter: Kyle, 4-0 and top 3 in scoring every week. How feeling?", a: "To quote The Wolf of Wall Street: I am not leaving! We are 40 and 4 in all-play. Walker, Doubs, Taylor, Bowers are all executing at an elite level." },
-                    { q: "Reporter: Mahomes finally started after three weeks on the bench?", a: "Mahomes was an expensive bench ornament, but when you have a Ferrari, eventually you take it out on the highway." },
-                    { q: "Reporter: You left Monangai's 28 points on the bench?", a: "If we swap them, we hit 154.4 points. But as Gladiator says: What we do in life echoes in eternity. We still got the win." },
-                    { q: "Reporter: AJ Brown returning soon?", a: "When AJ Brown comes off IR, it is game over. Rest of the league is playing for second place." },
-                    { q: "Reporter: Message to the league?", a: "Keep chasing. You come at the king, you best not miss." }
+                    { reporter: "Adam Schefter (ESPN)", q: "Kyle, you are 4-0 and top 3 in scoring every week. How are you feeling about this run?", a: "To quote The Wolf of Wall Street: I am not leaving! We are 40 and 4 in all-play. Walker, Doubs, Taylor, Bowers are biting kneecaps and executing at an elite level!" },
+                    { reporter: "Dianna Russini (The Athletic)", q: "Mahomes finally started after three weeks on the bench. What went into that call?", a: "Mahomes was a very expensive bench ornament, but when you have a Ferrari in the garage, eventually you take it out on the highway." },
+                    { reporter: "Ian Rapoport (NFL Network)", q: "You left Monangai's 28 points on the bench while Lemon posted 5.7?", a: "If we swap them, we hit 154.4 points. But as Gladiator says: What we do in life echoes in eternity. We got the win, period." },
+                    { reporter: "Mina Kimes (ESPN)", q: "AJ Brown and Jalen Coker are returning soon. How does that change things?", a: "When AJ Brown comes off IR, it is game over. Rest of the league is just playing for second place." },
+                    { reporter: "Tom Pelissero (NFL Network)", q: "What is your message to the rest of the league heading into Week 5?", a: "Keep chasing us. You come at the king, you best not miss!" }
                 ]
             },
             {
-                rank: 2, name: "Billy Wilson", team: "New Kid on the Block", record: "2-2", points: "527.52 PF", pitch: 1.0, rate: 1.1,
+                rank: 2, name: "Billy Wilson", team: "New Kid on the Block", record: "2-2", points: "527.52 PF", 
+                persona: "Voice Style: Mike McDaniel (Rapid, Quirky, High Energy)", pitch: 1.25, rate: 1.2, gender: "male",
                 qas: [
-                    { q: "Reporter: 29 more points than anyone else, but 2-2?", a: "It is a statistical anomaly! We are 33-11 in all-play. Moneyball said: How can you not be romantic about baseball? The wins will come." },
-                    { q: "Reporter: Nico Collins came back with 30.8 points?", a: "Nico is an absolute engine. Between him and Zay Flowers with 25.8, our receivers are unstoppable." },
-                    { q: "Reporter: Jahmyr Gibbs fell short of projection?", a: "Gibbs had 17.7 points. In what world is 17.7 a disappointment? We won comfortably." },
-                    { q: "Reporter: Both Caleb Williams and Jayden Daniels are out?", a: "Tyler Shough is carrying the load right now. Improvise, adapt, overcome until the young guys get healthy." },
-                    { q: "Reporter: Will luck turn around soon?", a: "We have 527 points. Bad luck cannot outrun elite production forever." }
+                    { reporter: "Ian Rapoport (NFL Network)", q: "Billy, you have 29 more points than anyone else, but you are sitting at 2-2. How frustrating is that?", a: "It is a statistical anomaly! We are 33-11 in all-play. Moneyball said: How can you not be romantic about baseball? The wins will come." },
+                    { reporter: "Mina Kimes (ESPN)", q: "Nico Collins came back from IR with 30.8 points. How huge was that?", a: "Nico is an absolute rocket engine. Between him and Zay Flowers with 25.8, our receivers are completely scheme-proof." },
+                    { reporter: "Josina Anderson (CBS Sports)", q: "Jahmyr Gibbs fell short of his projection. Any concern there?", a: "Gibbs had 17.7 points. In what world is 17.7 a disappointment? We won comfortably." },
+                    { reporter: "Adam Schefter (ESPN)", q: "Both Caleb Williams and Jayden Daniels are out. How are you managing QB?", a: "Tyler Shough is carrying the load right now. Improvise, adapt, overcome until the young guns get healthy." },
+                    { reporter: "Dianna Russini (The Athletic)", q: "Do you feel like the luck will turn around soon?", a: "We have 527 points. Bad luck cannot outrun elite production forever." }
                 ]
             },
             {
-                rank: 3, name: "David Schleicher", team: "Murray? Present", record: "2-2", points: "439.06 PF", pitch: 0.9, rate: 0.95,
+                rank: 3, name: "David Schleicher", team: "Murray? Present", record: "2-2", points: "439.06 PF", 
+                persona: "Voice Style: Andy Reid (Deep, Measured, Smooth)", pitch: 0.7, rate: 0.9, gender: "male",
                 qas: [
-                    { q: "Reporter: Left 79.5 points on your bench while scoring 78?", a: "Houston, we have a problem. Leaving Brian Robinson and Hockenson on the pine while McConkey goose-eggs is painful." },
-                    { q: "Reporter: Bench swaps would have won you the week easily?", a: "Any Given Sunday said it best: Football is a game of inches. Or in my case, bench points." },
-                    { q: "Reporter: Power rankings say lineup management is 11th best?", a: "The roster is nasty! You are ranking the vehicle, not the driver. Once I fix the cockpit, we take off." },
-                    { q: "Reporter: How do you fix the lineup process?", a: "Strict pre-game protocols. No more gut feelings over cold hard projections." },
-                    { q: "Reporter: Still confident in this roster?", a: "100 percent. The horsepower is under the hood. The driver just needs to put it in drive." }
+                    { reporter: "Tom Pelissero (NFL Network)", q: "David, you left 79.5 points on your bench while scoring 78 with starters. What happened?", a: "Houston, we have a problem. Leaving Brian Robinson and Hockenson on the pine while McConkey goose-eggs in flex is painful." },
+                    { reporter: "Adam Schefter (ESPN)", q: "Bench swaps would have won you the week easily instead of a 7.4-point loss?", a: "Any Given Sunday said it best: Football is a game of inches. Or in my case, bench points." },
+                    { reporter: "Mina Kimes (ESPN)", q: "The power rankings say your lineup management ranks 11th best in the league. Response?", a: "The roster is nasty! You are ranking the vehicle, not the driver. Once I fix the cockpit, we take off." },
+                    { reporter: "Ian Rapoport (NFL Network)", q: "How do you fix the lineup decision process for Week 5?", a: "Strict pre-game protocols. No more gut feelings over cold hard projections." },
+                    { reporter: "Josina Anderson (CBS Sports)", q: "Are you still confident in this roster long term?", a: "100 percent. The horsepower is under the hood. The driver just needs to put it in drive." }
                 ]
             },
             {
-                rank: 4, name: "Adam Edgerly", team: "Mamba Mentality", record: "3-1", points: "418.24 PF", pitch: 1.05, rate: 1.0,
+                rank: 4, name: "Adam Edgerly", team: "Mamba Mentality", record: "3-1", points: "418.24 PF", 
+                persona: "Voice Style: Sean McVay (Confident, Crisp, Fast)", pitch: 1.1, rate: 1.1, gender: "male",
                 qas: [
-                    { q: "Reporter: Puka Nacua returned with 27.7 points?", a: "Mamba mentality! Kobe said job is not finished. Puka came back and proved why he is the core." },
-                    { q: "Reporter: Buried Carson Wentz Forever 123 to 69?", a: "Joe Burrow and Alvin Kamara delivered in the flex. We put them away early and did not look back." },
-                    { q: "Reporter: Luck report says you should only have 2 wins?", a: "Luck is preparation meeting opportunity! Call it luck, call it grit, the standings say 3 and 1." },
-                    { q: "Reporter: Dalton Kincaid had back to back duds?", a: "Tight end is a battleground. We will tweak the scheme, no panic button." },
-                    { q: "Reporter: Outlook for Week 5?", a: "Dominate individual matchups. That is the formula." }
+                    { reporter: "Dianna Russini (The Athletic)", q: "Adam, Puka Nacua returned with 27.7 points. How big was his presence?", a: "Mamba mentality! Kobe said job is not finished. Puka came back and proved why he is the core of this offense." },
+                    { reporter: "Tom Pelissero (NFL Network)", q: "You buried Carson Wentz Forever 123 to 69. Was that a statement win?", a: "Joe Burrow and Alvin Kamara delivered in the flex. We put them away early and did not look back." },
+                    { reporter: "Mina Kimes (ESPN)", q: "The luck report says you should only have 2 wins. Are you living on borrowed time?", a: "Luck is preparation meeting opportunity! Call it luck, call it grit, the standings say 3 and 1." },
+                    { reporter: "Adam Schefter (ESPN)", q: "Dalton Kincaid had back-to-back duds at tight end. Any concerns?", a: "Tight end is a battleground. We will tweak the scheme, no panic button needed." },
+                    { reporter: "Ian Rapoport (NFL Network)", q: "What is your outlook for Week 5?", a: "Dominate individual matchups. That is the formula." }
                 ]
             },
             {
-                rank: 5, name: "Aaron Osten", team: "Chubby Chasers", record: "3-1", points: "389.26 PF", pitch: 1.2, rate: 1.1,
+                rank: 5, name: "Aaron Osten", team: "Chubby Chasers", record: "3-1", points: "389.26 PF", 
+                persona: "Voice Style: Pete Carroll (Super Enthusiastic, High Energy)", pitch: 1.2, rate: 1.15, gender: "male",
                 qas: [
-                    { q: "Reporter: Top score of the week at 145.76!", a: "Top Gun style: I feel the need, the need for speed! CeeDee Lamb went nuclear for 41.3!" },
-                    { q: "Reporter: Started Emanuel Wilson at RB2 for 27 points?", a: "They called me crazy after his 1.4 last week! Dark Knight taught me: They laughed because I was different!" },
-                    { q: "Reporter: Scoring has gone up every single week?", a: "We are skyrocketing! LaPorta, Tate, everyone chipped in. Trendline is pointing straight up!" },
-                    { q: "Reporter: Barkley got 2 points, McLaurin out?", a: "Imagine when we get Barkley and Terry back! This is not even our final form!" },
-                    { q: "Reporter: Expected wins say you should be 2-2?", a: "I would rather be lucky than good, but right now we are BOTH!" }
+                    { reporter: "Josina Anderson (CBS Sports)", q: "Aaron, top score of the week at 145.76! How does it feel?", a: "Top Gun style baby! I feel the need, the need for speed! CeeDee Lamb went nuclear for 41.3!" },
+                    { reporter: "Adam Schefter (ESPN)", q: "You started Emanuel Wilson at RB2 for 27 points. How genius was that call?", a: "They called me crazy after his 1.4 last week! Dark Knight taught me: They laughed at me because I was different!" },
+                    { reporter: "Dianna Russini (The Athletic)", q: "Your scoring has gone up every single week. Is this real momentum?", a: "We are skyrocketing! LaPorta, Tate, everyone chipped in. Trendline is pointing straight to the moon!" },
+                    { reporter: "Tom Pelissero (NFL Network)", q: "Barkley got 2 points and McLaurin was out. Can you sustain this?", a: "Imagine when we get Barkley and Terry back! This is not even our final form!" },
+                    { reporter: "Mina Kimes (ESPN)", q: "Expected wins say you should be 2-2. Do you care about the luck stat?", a: "I would rather be lucky than good, but right now we are BOTH!" }
                 ]
             },
             {
-                rank: 6, name: "Keith Garner", team: "We need kickers", record: "2-2", points: "438.64 PF", pitch: 0.95, rate: 0.95,
+                rank: 6, name: "Keith Garner", team: "We need kickers", record: "2-2", points: "438.64 PF", 
+                persona: "Voice Style: Jim Harbaugh (Raspy, Gravelly, Serious)", pitch: 0.75, rate: 0.95, gender: "male",
                 qas: [
-                    { q: "Reporter: Lost despite a solid score?", a: "Dodgeball said it: Sometimes you are the windshield, sometimes you are the bug. We were the bug." },
-                    { q: "Reporter: Juwan Johnson left 11.9 on your bench?", a: "Johnson left 35 points on my bench over two weeks. It is frustrating, we must read the room better." },
-                    { q: "Reporter: RB room looks like a hospital wing?", a: "It is an ER ward down there! But Javonte Williams stepping up with 31 points showed we have fight." },
-                    { q: "Reporter: Bryce Young put up 21.4 points?", a: "Bryce showed real poise. He gave us a chance when JaMarr Chase struggled." },
-                    { q: "Reporter: How stay afloat at 2-2?", a: "Next man up mentality. We patch the boat and keep sailing." }
+                    { reporter: "Ian Rapoport (NFL Network)", q: "Keith, you lost despite a solid score. How much of this is bad luck?", a: "Dodgeball said it: Sometimes you are the windshield, sometimes you are the bug. We were the bug this week." },
+                    { reporter: "Mina Kimes (ESPN)", q: "Juwan Johnson left 11.9 on your bench while starters struggled. Is bench management an issue?", a: "Johnson left 35 points on my bench over two weeks. It is frustrating, we must read the room better." },
+                    { reporter: "Adam Schefter (ESPN)", q: "Your RB room looks like a hospital wing right now. How are you coping?", a: "It is an ER ward down there! But Javonte Williams stepping up with 31 points showed we still have fight." },
+                    { reporter: "Dianna Russini (The Athletic)", q: "Bryce Young put up 21.4 points. Are you sticking with him?", a: "Bryce showed real poise. He gave us a chance when JaMarr Chase struggled." },
+                    { reporter: "Tom Pelissero (NFL Network)", q: "How do you stay afloat at 2-2 with all these injuries?", a: "Next man up mentality. We patch the boat and keep sailing." }
                 ]
             },
             {
-                rank: 7, name: "Josh Fenske", team: "King Henry", record: "1-3", points: "440.66 PF", pitch: 0.85, rate: 1.0,
+                rank: 7, name: "Josh Fenske", team: "King Henry", record: "1-3", points: "440.66 PF", 
+                persona: "Voice Style: Nick Sirianni (Emotional, Passionate)", pitch: 1.15, rate: 1.1, gender: "male",
                 qas: [
-                    { q: "Reporter: McMillan scored 45.2 and you STILL lost by 22?", a: "Tragic! Hunger Games lied, odds are not in my favor! 3rd most points in league and sitting at 1-3!" },
-                    { q: "Reporter: Named unluckiest team in the league?", a: "Cold comfort! We are 25-19 in all-play! Every week my opponent plays like the 85 Bears!" },
-                    { q: "Reporter: Kelce gave 3.5 while Andrews sat with 13.7?", a: "Even with the right TE swap, we do not catch 134 points. Universe had it out for us." },
-                    { q: "Reporter: Jeremiyah Love had 6.5 with Allgeier on bench?", a: "When it rains, it pours. Right process moves, worst-case outcomes." },
-                    { q: "Reporter: Message to your team at 1-3?", a: "Hold the line! Law of averages has to kick in eventually." }
+                    { reporter: "Tom Pelissero (NFL Network)", q: "Josh, McMillan scored 45.2 points and you STILL lost by 22? How?", a: "Tragic! Hunger Games lied, odds are not in my favor! 3rd most points in league and sitting at 1-3!" },
+                    { reporter: "Josina Anderson (CBS Sports)", q: "You were officially named the unluckiest team in the league. Does that help?", a: "Cold comfort! We are 25-19 in all-play! Every week my opponent plays like the 85 Bears against me!" },
+                    { reporter: "Dianna Russini (The Athletic)", q: "Kelce gave 3.5 while Andrews sat with 13.7. Was that the game?", a: "Even with the right TE swap, we do not catch 134 points. The universe had it out for us." },
+                    { reporter: "Adam Schefter (ESPN)", q: "Jeremiyah Love had 6.5 with Allgeier on the bench. More lineup pain?", a: "When it rains, it pours. Making the right process moves, getting worst-case outcomes." },
+                    { reporter: "Mina Kimes (ESPN)", q: "What is your message to your squad at 1-3?", a: "Hold the line! The law of averages has to kick in eventually!" }
                 ]
             },
             {
-                rank: 8, name: "Zach Spencer", team: "Drop Your Nuts", record: "2-2", points: "411.3 PF", pitch: 1.05, rate: 1.05,
+                rank: 8, name: "Zach Spencer", team: "Drop Your Nuts", record: "2-2", points: "411.3 PF", 
+                persona: "Voice Style: Kyle Shanahan (Calculated, Confident)", pitch: 1.0, rate: 1.05, gender: "male",
                 qas: [
-                    { q: "Reporter: Big win over Win At All Costs, Maye over Stafford?", a: "Top Gun rules: You do not have time to think up there. If you think, you are dead. Maye gave us 26 points." },
-                    { q: "Reporter: Nabers, Olave, Kraft, Cook delivered?", a: "The core came through. Malik Nabers is a superstar. Olave was steady." },
-                    { q: "Reporter: Left Ollie Gordon's 18 on the bench?", a: "Nobody plays a perfect game. We won by 49 points, not losing sleep over RB2 optimization." },
-                    { q: "Reporter: Where does team stand at 2-2?", a: "Right in the thick of it. Balanced, aggressive, ready to make a run." },
-                    { q: "Reporter: Strategy for next week?", a: "Drop the hammer. Keep starting high-upside plays." }
+                    { reporter: "Adam Schefter (ESPN)", q: "Zach, big win over Win At All Costs. Starting Drake Maye over Stafford paid off.", a: "Top Gun rules: You do not have time to think up there. If you think, you are dead. Maye gave us 26 points." },
+                    { reporter: "Ian Rapoport (NFL Network)", q: "Nabers, Olave, Kraft, and Cook all delivered strong outings. How good was the core?", a: "The core came through. Malik Nabers is a superstar. Olave was steady." },
+                    { reporter: "Mina Kimes (ESPN)", q: "You left Ollie Gordon's 18 on the bench for Braelon Allen. Any regrets?", a: "Nobody plays a perfect game. We won by 49 points, not losing sleep over RB2 optimization." },
+                    { reporter: "Tom Pelissero (NFL Network)", q: "Where does this team stand in the playoff picture at 2-2?", a: "Right in the thick of it. Balanced, aggressive, ready to make a run." },
+                    { reporter: "Dianna Russini (The Athletic)", q: "What is the strategy heading into next week?", a: "Drop the hammer. Keep starting high-upside plays." }
                 ]
             },
             {
-                rank: 9, name: "Mike Gant", team: "Fenske's Favorite Team Name", record: "1-3", points: "417.88 PF", pitch: 0.9, rate: 0.9,
+                rank: 9, name: "Mike Gant", team: "Fenske's Favorite Team Name", record: "1-3", points: "417.88 PF", 
+                persona: "Voice Style: Mike Tomlin (Low, Stern, Direct)", pitch: 0.65, rate: 0.85, gender: "male",
                 qas: [
-                    { q: "Reporter: Faced 516 points against, most in league?", a: "Brutal! Every week feels like walking into a gauntlet. Kyren Williams puts up 36.7 and we still lose by 132." },
-                    { q: "Reporter: Kenyon Sadiq got a goose egg at TE?", a: "Pure roulette! Put a chip on black and it hits red every single time." },
-                    { q: "Reporter: 5 roster spots filled with injured guys?", a: "Bench looks like a MASH unit. Holding on by a thread." },
-                    { q: "Reporter: ZERO waiver moves all season?", a: "I believe in patience. You do not throw the baby out with the bathwater." },
-                    { q: "Reporter: Will you make a waiver move this week?", a: "Evaluating. If the right piece is there, maybe. Otherwise, stand firm." }
+                    { reporter: "Dianna Russini (The Athletic)", q: "Mike, you have faced 516 points against, most in the league. How frustrating is this schedule?", a: "Brutal! Every week feels like walking into a gauntlet. Kyren Williams puts up 36.7 and we still lose by 132." },
+                    { reporter: "Josina Anderson (CBS Sports)", q: "Kenyon Sadiq got a goose egg at tight end. Is TE becoming a nightmare?", a: "Pure roulette! Put a chip on black and it hits red every single time." },
+                    { reporter: "Adam Schefter (ESPN)", q: "Five roster spots are currently filled with injured players. How bad is depth?", a: "Bench looks like a MASH unit. Holding on by a thread." },
+                    { reporter: "Mina Kimes (ESPN)", q: "You are the ONLY manager in the league with ZERO waiver moves. Why?", a: "I believe in patience. You do not throw the baby out with the bathwater." },
+                    { reporter: "Ian Rapoport (NFL Network)", q: "Will you finally make a waiver move this week?", a: "Evaluating. If the right piece is there, maybe. Otherwise, stand firm." }
                 ]
             },
             {
-                rank: 10, name: "David Archer", team: "Carson Wentz forever", record: "2-2", points: "361.74 PF", pitch: 1.1, rate: 1.0,
+                rank: 10, name: "David Archer", team: "Carson Wentz forever", record: "2-2", points: "361.74 PF", 
+                persona: "Voice Style: Kliff Kingsbury (Upbeat, Casual)", pitch: 1.1, rate: 1.05, gender: "male",
                 qas: [
-                    { q: "Reporter: Scored under 80 twice, still 2-2?", a: "Han Solo said it best: Never tell me the odds! A win is a win, we are 500!" },
-                    { q: "Reporter: Started Parker Washington for 2 points over Judkins?", a: "Gambled on matchups and took a hit. 19 point swing hurts." },
-                    { q: "Reporter: 10 waiver moves and starting Parker Washington?", a: "Activity shows hustle! Talladega Nights: If you ain't first, you are last!" },
-                    { q: "Reporter: Jefferson and Tyreek Hill on bench?", a: "When those two step back on the gridiron, league won't know what hit them. Stashing dynamite!" },
-                    { q: "Reporter: Keep winning with sub-80 performances?", a: "Plan on scoring way more, but two wins in the bank!" }
+                    { reporter: "Tom Pelissero (NFL Network)", q: "David, scored under 80 twice, yet sitting at 2-2. How lucky do you feel?", a: "Han Solo said it best: Never tell me the odds! A win is a win, we are 500!" },
+                    { reporter: "Ian Rapoport (NFL Network)", q: "Started Parker Washington for 2 points over Judkins on the bench?", a: "Gambled on matchups and took a hit. A 19 point swing hurts." },
+                    { reporter: "Adam Schefter (ESPN)", q: "You lead the league with 10 waiver moves, yet started Washington?", a: "Activity shows hustle! Talladega Nights: If you ain't first, you are last!" },
+                    { reporter: "Mina Kimes (ESPN)", q: "Jefferson and Tyreek Hill are sitting on your bench. When do they return?", a: "When those two step back on the gridiron, league won't know what hit them. Stashing dynamite!" },
+                    { reporter: "Dianna Russini (The Athletic)", q: "Can you keep winning with sub-80 point performances?", a: "Plan on scoring way more, but two wins in the bank!" }
                 ]
             },
             {
-                rank: 11, name: "Kevin Erdal", team: "Questionable", record: "1-3", points: "373.3 PF", pitch: 0.95, rate: 0.9,
+                rank: 11, name: "Kevin Erdal", team: "Questionable", record: "1-3", points: "373.3 PF", 
+                persona: "Voice Style: Arthur Smith (Quiet, Low, Gruff)", pitch: 0.8, rate: 0.9, gender: "male",
                 qas: [
-                    { q: "Reporter: First win of the season! Relief?", a: "Shawshank Redemption: Hope is a good thing, maybe the best of things. Finally got off the schneid!" },
-                    { q: "Reporter: Bench scored 83.2 points?", a: "Scary! RJ Harvey with 19, Stevenson with 18 sitting there watching Montgomery get 4. Got lucky David left points on bench." },
-                    { q: "Reporter: Chuba Hubbard was hero with 25.9 points?", a: "Chuba carried this franchise on his back this weekend! Absolute warrior." },
-                    { q: "Reporter: All-play record is worst in league?", a: "Do not look at all-play. Look at scoreboard Sunday night. One win builds confidence." },
-                    { q: "Reporter: Changes for Week 5?", a: "Promoting bench players! Harvey and Stevenson earned their stripes." }
+                    { reporter: "Josina Anderson (CBS Sports)", q: "Kevin, congratulations on your first win! Relief?", a: "Shawshank Redemption: Hope is a good thing, maybe the best of things. Finally got off the schneid!" },
+                    { reporter: "Adam Schefter (ESPN)", q: "Bench scored 83.2 points—almost as much as starters. Concerning?", a: "Scary! RJ Harvey with 19, Stevenson with 18 sitting there watching Montgomery get 4. Got lucky David left points on bench." },
+                    { reporter: "Tom Pelissero (NFL Network)", q: "Chuba Hubbard was your hero with 25.9 points. Praise for Chuba?", a: "Chuba carried this franchise on his back this weekend! Absolute warrior." },
+                    { reporter: "Mina Kimes (ESPN)", q: "All-play record is worst in the league. How do you build on this victory?", a: "Do not look at all-play. Look at scoreboard Sunday night. One win builds confidence." },
+                    { reporter: "Dianna Russini (The Athletic)", q: "Any lineup changes planned for Week 5?", a: "Promoting bench players! Harvey and Stevenson earned their stripes." }
                 ]
             },
             {
-                rank: 12, name: "Dan Koss", team: "Win at all costs", record: "1-3", points: "354.12 PF", pitch: 0.75, rate: 0.8,
+                rank: 12, name: "Dan Koss", team: "Win at all costs", record: "1-3", points: "354.12 PF", 
+                persona: "Voice Style: Bill Belichick (Deadpan, Monotone, Demoralized)", pitch: 0.55, rate: 0.75, gender: "male",
                 qas: [
-                    { q: "Reporter: Lowest points, Mariota 5 pts, Rice 0 pts?", a: "I do not know anymore. Matrix said: Ignorance is bliss. But there is no bliss here. Just pain." },
-                    { q: "Reporter: Added Joe Mixon... a free agent without a team?", a: "I thought he would sign somewhere! Trying to be proactive, holding a ghost on my bench instead." },
-                    { q: "Reporter: Tee Higgins gave 26 points on bench?", a: "Every decision turns to dust. Titanic hit the iceberg. I am the iceberg, the ship, and the cold water." },
-                    { q: "Reporter: Analysts say team built to lose on technicality?", a: "Nothing is fair. We are demoralized, bewildered, heartbroken, and lost in the dark." },
-                    { q: "Reporter: What is the plan for Week 5?", a: "To wake up from this nightmare. That is the only plan." }
+                    { reporter: "Adam Schefter (ESPN)", q: "Dan, lowest points in league, starting Mariota for 5 pts and Rice for 0. How do you explain this?", a: "I do not know anymore. Matrix said: Ignorance is bliss. But there is no bliss here. Just pain." },
+                    { reporter: "Ian Rapoport (NFL Network)", q: "You added Joe Mixon... a free agent without a team. What was the strategy?", a: "I thought he would sign somewhere! Trying to be proactive, holding a ghost on my bench instead." },
+                    { reporter: "Dianna Russini (The Athletic)", q: "Tee Higgins gave 26 points on bench while starters scored 74. Why?", a: "Every decision turns to dust. Titanic hit the iceberg. I am the iceberg, the ship, and the cold water." },
+                    { reporter: "Tom Pelissero (NFL Network)", q: "Analysts say your team is built to lose on a technicality. Is that fair?", a: "Nothing is fair. We are demoralized, bewildered, heartbroken, and lost in the dark." },
+                    { reporter: "Mina Kimes (ESPN)", q: "What is the plan for Week 5?", a: "To wake up from this nightmare. That is the only plan." }
                 ]
             }
         ];
 
         let selectedCoach = coaches[0];
         let synth = window.speechSynthesis;
+        let availableVoices = [];
 
         function init() {
+            populateVoices();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = populateVoices;
+            }
             renderManagerList();
             loadCoach(coaches[0]);
+        }
+
+        function populateVoices() {
+            availableVoices = synth.getVoices();
+        }
+
+        function getVoiceForRole(roleType) {
+            if (!availableVoices.length) return null;
+            if (roleType === "reporter_female") {
+                return availableVoices.find(v => v.lang.startsWith("en") && (v.name.includes("Zira") || v.name.includes("Samantha") || v.name.includes("Victoria") || v.name.includes("Female"))) || availableVoices[0];
+            }
+            if (roleType === "reporter_male") {
+                return availableVoices.find(v => v.lang.startsWith("en") && (v.name.includes("David") || v.name.includes("Alex") || v.name.includes("Male"))) || availableVoices[0];
+            }
+            return availableVoices.find(v => v.lang.startsWith("en")) || availableVoices[0];
         }
 
         function renderManagerList() {
@@ -238,44 +273,95 @@
             document.getElementById('coachName').innerText = coach.name + " (" + coach.team + ")";
             document.getElementById('teamDetails').innerText = "Record: " + coach.record + " | Total Points: " + coach.points;
             document.getElementById('coachRank').innerText = "Power Rank #" + coach.rank;
+            document.getElementById('voicePersona').innerText = coach.persona;
 
             const qaList = document.getElementById('qaList');
             qaList.innerHTML = coach.qas.map((qa, i) => `
                 <div class="qa-card" id="qa-${i}">
-                    <div class="question">
-                        <span>${qa.q}</span>
-                        <button class="play-single-btn" onclick="speakText(${i})">Play Answer</button>
+                    <div class="reporter-tag">
+                        <span>🎙️ ${qa.reporter}</span>
+                        <button class="play-single-btn" onclick="speakExchange(${i})">Play Q&A</button>
                     </div>
-                    <div class="answer">${qa.a}</div>
+                    <div class="question">"${qa.q}"</div>
+                    <div class="answer"><strong>${coach.name}:</strong> "${qa.a}"</div>
                 </div>
             `).join('');
         }
 
-        function speakText(index) {
+        function speakExchange(index) {
             synth.cancel();
             document.querySelectorAll('.qa-card').forEach(c => c.classList.remove('speaking'));
             const card = document.getElementById('qa-' + index);
             if (card) card.classList.add('speaking');
 
-            const text = selectedCoach.qas[index].a;
-            const utter = new SpeechSynthesisUtterance(text);
-            utter.pitch = selectedCoach.pitch;
-            utter.rate = selectedCoach.rate;
-            utter.onend = function() {
+            const qa = selectedCoach.qas[index];
+            const isFemaleReporter = qa.reporter.includes("Mina") || qa.reporter.includes("Dianna") || qa.reporter.includes("Josina");
+
+            // Reporter Question Utterance
+            const reporterUtter = new SpeechSynthesisUtterance(qa.reporter.split(" ")[0] + " asks: " + qa.q);
+            reporterUtter.pitch = isFemaleReporter ? 1.3 : 1.1;
+            reporterUtter.rate = 1.1;
+            const reporterVoice = getVoiceForRole(isFemaleReporter ? "reporter_female" : "reporter_male");
+            if (reporterVoice) reporterUtter.voice = reporterVoice;
+
+            // Coach Answer Utterance
+            const coachUtter = new SpeechSynthesisUtterance(qa.a);
+            coachUtter.pitch = selectedCoach.pitch;
+            coachUtter.rate = selectedCoach.rate;
+            const coachVoice = getVoiceForRole("coach");
+            if (coachVoice) coachUtter.voice = coachVoice;
+
+            reporterUtter.onend = function() {
+                synth.speak(coachUtter);
+            };
+
+            coachUtter.onend = function() {
                 if (card) card.classList.remove('speaking');
             };
-            synth.speak(utter);
+
+            synth.speak(reporterUtter);
         }
 
         document.getElementById('playAllBtn').onclick = function() {
             synth.cancel();
-            let delay = 0;
-            selectedCoach.qas.forEach((qa, i) => {
-                setTimeout(function() {
-                    speakText(i);
-                }, delay);
-                delay += (qa.a.length * 65) + 1500;
-            });
+            let currentIdx = 0;
+
+            function playNext() {
+                if (currentIdx >= selectedCoach.qas.length) return;
+                
+                document.querySelectorAll('.qa-card').forEach(c => c.classList.remove('speaking'));
+                const card = document.getElementById('qa-' + currentIdx);
+                if (card) card.classList.add('speaking');
+
+                const qa = selectedCoach.qas[currentIdx];
+                const isFemaleReporter = qa.reporter.includes("Mina") || qa.reporter.includes("Dianna") || qa.reporter.includes("Josina");
+
+                const reporterUtter = new SpeechSynthesisUtterance(qa.reporter + " asks: " + qa.q);
+                reporterUtter.pitch = isFemaleReporter ? 1.3 : 1.1;
+                reporterUtter.rate = 1.1;
+                const reporterVoice = getVoiceForRole(isFemaleReporter ? "reporter_female" : "reporter_male");
+                if (reporterVoice) reporterUtter.voice = reporterVoice;
+
+                const coachUtter = new SpeechSynthesisUtterance(qa.a);
+                coachUtter.pitch = selectedCoach.pitch;
+                coachUtter.rate = selectedCoach.rate;
+                const coachVoice = getVoiceForRole("coach");
+                if (coachVoice) coachUtter.voice = coachVoice;
+
+                reporterUtter.onend = function() {
+                    synth.speak(coachUtter);
+                };
+
+                coachUtter.onend = function() {
+                    if (card) card.classList.remove('speaking');
+                    currentIdx++;
+                    setTimeout(playNext, 1000);
+                };
+
+                synth.speak(reporterUtter);
+            }
+
+            playNext();
         };
 
         document.getElementById('stopBtn').onclick = function() {
